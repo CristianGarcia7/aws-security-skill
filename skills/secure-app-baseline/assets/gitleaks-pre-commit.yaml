@@ -1,0 +1,15 @@
+# .pre-commit-config.yaml — install with:
+#   pip install pre-commit  (or: brew install pre-commit)
+#   pre-commit install
+#
+# This blocks a commit that introduces a secret matching gitleaks' default
+# rule set (AWS keys, generic API keys/tokens, private keys, etc.) before it
+# ever reaches history. It complements, not replaces, the .env rules in
+# references/secrets-and-env.md — a leak prevented here never needs the
+# rotation procedure in that file.
+
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks

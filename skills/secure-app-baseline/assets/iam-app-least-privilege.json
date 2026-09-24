@@ -1,0 +1,79 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowS3ObjectOpsOnWorkloadPrefix",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::<BUCKET>/<PREFIX>/*"
+    },
+    {
+      "Sid": "AllowSesSendFromScopedIdentity",
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+      ],
+      "Resource": "arn:aws:ses:<REGION>:<ACCOUNT_ID>:identity/<SES_IDENTITY>",
+      "Condition": {
+        "StringEquals": {
+          "ses:FromAddress": "noreply@<DOMAIN>"
+        }
+      }
+    },
+    {
+      "Sid": "AllowBedrockInvokeOnNamedModelsOnly",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "arn:aws:bedrock:<REGION>::foundation-model/<MODEL_ID>"
+    },
+    {
+      "Sid": "DenyOtherS3Buckets",
+      "Effect": "Deny",
+      "Action": "s3:*",
+      "NotResource": [
+        "arn:aws:s3:::<BUCKET>",
+        "arn:aws:s3:::<BUCKET>/<PREFIX>/*"
+      ]
+    },
+    {
+      "Sid": "DenyIamAndBroadBedrockAndEscalation",
+      "Effect": "Deny",
+      "Action": [
+        "iam:*",
+        "bedrock:CreateModelCustomizationJob",
+        "bedrock:CreateProvisionedModelThroughput",
+        "bedrock:PutModelInvocationLoggingConfiguration",
+        "sts:AssumeRole",
+        "iam:CreatePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:AttachRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:AttachUserPolicy",
+        "iam:PutUserPolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "OptionalDenyOutsideWorkloadEgress",
+      "Effect": "Deny",
+      "NotAction": "sts:GetCallerIdentity",
+      "Resource": "*",
+      "Condition": {
+        "NotIpAddressIfExists": {
+          "aws:SourceIp": "<WORKLOAD_EGRESS_CIDR>"
+        },
+        "BoolIfExists": {
+          "aws:ViaAWSService": "false"
+        }
+      }
+    }
+  ]
+}
