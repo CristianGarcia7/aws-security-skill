@@ -4,7 +4,7 @@ description: "Trigger: new backend project, NestJS/Express API, .env secrets, AW
 license: Apache-2.0
 metadata:
   author: "cristian.garcia"
-  version: "1.0"
+  version: "1.1"
 ---
 
 ## Activation Contract
@@ -23,6 +23,7 @@ Load for backend work touching AWS: new API project, `.env`/secrets, S3 upload/d
 - **SES**: `ses:SendEmail` on the identity ARN plus `ses:FromAddress` condition; SPF/DKIM/DMARC set; never let user input set `From`/recipients; handle bounces/complaints; rate-limit sending endpoints.
 - **Bedrock/AI**: deny by default; if needed, only `bedrock:InvokeModel` on specific model ARNs, invocation logging on, Budgets + Cost Anomaly Detection — leaked keys enable LLMjacking.
 - **Baseline**: CloudTrail all-regions, GuardDuty, budget alarms, no root keys, MFA. App: whitelist validation, deny-by-default authn+authz per route, rate limiting, helmet headers, CORS allowlist, no stack traces/secrets in errors/logs, dependency audit, no debug/Swagger in prod.
+- **Improvement loop**: source repo `github.com/CristianGarcia7/aws-security-skill`. If a rule was missing, wrong, or ambiguous, or an asset failed, ask the user ONE yes/no question after the task to contribute a fix. Never submit without explicit approval; privacy-scrub first (no IDs, IPs, keys, names, amounts). Flow: `references/improving-this-skill.md`.
 
 ## Decision Gates
 
@@ -56,27 +57,14 @@ Load for backend work touching AWS: new API project, `.env`/secrets, S3 upload/d
 6. Check app-level hardening (`references/app-hardening.md`, `references/nestjs.md` if NestJS).
 7. Run `assets/audit-env-perms.sh`, `assets/audit-aws-exposure.sh`; walk `references/checklist.md`.
 8. Report findings and fixes applied.
+9. If a skill gap appeared, ask the improvement question and stop until answered.
 
 ## Output Contract
 
-Return: findings table (severity, file/resource, issue, fix), what was applied vs. remaining risk, and `checklist.md` result (pass/fail per item).
+Return: findings table (severity, file/resource, issue, fix), what was applied vs. remaining risk, and `checklist.md` result (pass/fail per item). If a skill gap was found, end with the single improvement question.
 
 ## References
 
-- `references/secrets-and-env.md` — credential chain, `.env` rules, rotation.
-- `references/iam-least-privilege.md` — roles, denies, guardrail caveats, IMDSv2.
-- `references/network-and-ports.md` — SG rules, SSM vs SSH, private DB, audits.
-- `references/s3-and-presigned-urls.md` — bucket config, presigned rules, OAC.
-- `references/ses-email.md` — identity scoping, DNS auth, abuse prevention.
-- `references/bedrock-and-ai.md` — deny-by-default, logging, cost controls.
-- `references/app-hardening.md` — OWASP API Top 10 checklist.
-- `references/nestjs.md` — NestJS mapping of every rule.
-- `references/incident-lessons.md` — lessons from a real compromise.
-- `references/checklist.md` — pre-deploy checklist.
-- `assets/iam-app-least-privilege.json` — least-privilege IAM policy.
-- `assets/s3-bucket-policy.json` — deny non-TLS, OAC-only reads.
-- `assets/presigned-url.service.ts` — NestJS presigned URL example.
-- `assets/env.validation.ts` — fail-fast env schema example.
-- `assets/audit-env-perms.sh` — `.env` permission/secret audit.
-- `assets/audit-aws-exposure.sh` — AWS exposure audit (SGs, RDS, S3, IMDS, keys).
-- `assets/gitleaks-pre-commit.yaml` — pre-commit hook example.
+- `references/` — one file per topic: `secrets-and-env`, `iam-least-privilege`, `network-and-ports`, `s3-and-presigned-urls`, `ses-email`, `bedrock-and-ai`, `app-hardening` (OWASP API Top 10), `nestjs` (NestJS mapping), `incident-lessons`, `checklist` (pre-deploy).
+- `references/improving-this-skill.md` — approval-gated contribution flow to the source repo.
+- `assets/` — `iam-app-least-privilege.json`, `s3-bucket-policy.json`, `presigned-url.service.ts`, `env.validation.ts`, `gitleaks-pre-commit.yaml`, read-only audits `audit-env-perms.sh` and `audit-aws-exposure.sh`.

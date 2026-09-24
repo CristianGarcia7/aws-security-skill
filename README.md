@@ -207,6 +207,17 @@ cd ~/aws-security-skill && ./install.sh --uninstall
 | Kiro or OpenCode doesn't find it | Confirm the folder exists at the path their table row shows. |
 | Permission error during install | Never use `sudo` with this script. Check you own the target folder (`~/.claude`, `~/.agents`, `~/.kiro`, or your project folder). |
 
+## Help improve it
+
+This skill is public and free for everyone. It gets better every time someone uses it.
+
+- While working, your agent may notice a missing or outdated rule, or a script that failed.
+- At the end of the task it asks you **one yes/no question**: do you want to contribute that improvement?
+- **No** → nothing happens. **Yes** → it removes private data first (account IDs, IPs, keys, names, costs), shows you the change, and only then opens a pull request (or an issue if you don't use `gh`).
+- Nothing is ever sent without your approval. The maintainer reviews every pull request before it is merged.
+
+You can also open an issue or pull request by hand: https://github.com/CristianGarcia7/aws-security-skill/issues
+
 ## License
 
 Apache-2.0 — see [LICENSE](LICENSE).
